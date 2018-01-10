@@ -1,0 +1,249 @@
+---
+title: "Intro to ggplot"
+author: "Allison Horst"
+date: "January 17, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+We'll be using data for National Parks visitation to practice basic data visualization using ggplot (from the National Park Service)
+
+##What is ggplot? 
+
+ggplot is a graphics package specifically built to help you iteratively create customized graphs. It exists solo, or within the *tidyverse* - a collection of data wrangling, visualizing, and presenting packages that play nicely together. 
+
+##1. Load tidyverse (install if necessary)
+
+If you do NOT have the tidyverse installed, you may need to install it first using **install.packages("tidyverse")**. When you install a package, then it exists in R's brain but is dormant.
+
+Once it is install, you can load the tidyverse package using **library(tidyverse)** [this actually makes the package active].
+
+You only need to install packages once, but you need to *load* them each time.
+
+**Note: I'll be working in an R script for this workshop. You might also make a markdown document with notes.**
+
+```{r packages, results = "hide", message = FALSE}
+
+library(tidyverse)
+
+```
+
+##2. Get and load the NP visitation data
+
+Load the np_visit.csv file (sent in email, or pulled from GitHub) into RStudio. Helpers will be ready to assist you. 
+
+```{r data, results = "hide", message = FALSE}
+
+np_visit <- read_csv("~/Documents/Bren Courses/EcoDataSci Meetings/Data Vis/NP Visitation/np_visit.csv")
+
+```
+
+##3. Single series scatterplot (Dinosaur National Monument visitors)
+
+First, we'll explore visitation at Dinosaur National Monument.
+
+Let's make a subset of our data that only contains information for Dinosaur (I'll call my subset dino_nm). We'll use this subset to create our graph. 
+
+```{r dinosaur, results = "hide", message = FALSE}
+
+dino_nm <- np_visit %>% 
+  filter(park_name == "Dinosaur National Monument")
+
+```
+
+Take a look at that data frame (View() or just click on the blue circle with arrow next to it in the Environment tab). We'll make a scatterplot of year (x-axis) versus visitors (y-axis).
+
+How do we make that graph in ggplot?
+
+To make the most basic graph, you need to tell R three things:
+
+1. You're using ggplot
+2. What data is used to create the graph 
+3. What type of graph you want to create
+
+...everything beyond that is optional customization.
+
+So code to make the most basic scatterplot for Dinosaur NM might look something like this: 
+
+```{r dino_graph}
+
+ggplot(data = dino_nm, aes(x = year, y = visitors)) +
+  geom_point()
+
+```
+
+Note that we used the aes() - aesthetics - argument here. Whenever you are referencing a variable in ggplot code, it needs to be within an aes() argument. 
+
+You'd want to customize that graph - we'll get back to customization later on. For now, focus on the structure of the ggplot code. 
+
+What if we have more than one series we're trying to plot?
+
+##4. Multi-series graph of California National Parks visitation
+
+Make a new subset (I'll store as data frame 'np_ca') that only includes annual visitors in California National Parks, and arrange by park name (alphabetical) then year (increasing). *Note: data wrangling using dplyr and tidyr will be covered in another eco-data-sci workshop.*
+
+```{r ca_visits, results = "hide", message = FALSE}
+
+np_ca <- np_visit %>% # introduce pipe operator?
+  filter(state == "CA" & type == "National Park") %>% 
+  arrange(park_name, year)
+
+```
+
+Go exploring a little bit. How many parks are there in California, and what are they? 
+
+```{r explore}
+
+summary(np_ca) # Useful to see the class of each variable (column)
+
+unique(np_ca$park_name) # If a factor, can use 'levels' - but this is just a character
+
+length(unique(np_ca$park_name)) # To see how many there are
+
+```
+
+Now let's make a scatterplot graph (year v. visitors for the 9 California NPs):
+
+```{r ca_np_graph}
+
+ggplot(data = np_ca, aes(x = year, y = visitors)) + # There are (1) and (2)
+  geom_point() # This is (3) - what type of graph do you want to create?
+
+```
+
+
+Now you have made a totally hideous and useless graph - but it DOES contain all of the correct data. We just need to figure out how to clean it up a little bit to make it useful.
+
+How do we do that?
+
+##5. Updating series characteristics by *variable* 
+
+We would like for each CA National Park series to be shown in a different color. We can do that by updating within the geom_point() layer (that's the layer where the points are added...). Since we're referencing a variable (park_name), we'll need to use the aes() argument. Anything that is not variable specified can be added outside of an aes() argument. 
+
+Like this: 
+
+```{r}
+
+ggplot(data = np_ca, aes(x = year, y = visitors)) + 
+  geom_point(aes(color = park_name))
+
+```
+
+##6. Customization - updating labels and titles
+
+We customize graphs in ggplot *iteratively* by adding layers (using the plus sign '+') to a base graphic and/or adding arguments within layers.
+
+Use xlab() and ylab() layers to update x- and y-axis labels, and ggtitle() to add a graph title
+
+  graph + 
+  xlab("This is my x-label") +
+  ylab("This is my y-label") +
+  ggtitle("This is my graph title")
+  
+```{r}
+
+ggplot(data = np_ca, aes(x = year, y = visitors)) +
+  geom_point(aes(color = park_name)) + 
+  xlab("Year") +
+  ylab("Annual Visitors") +
+  ggtitle("California National Parks Visitation") +
+  theme(legend.title=element_blank())
+
+```
+
+##7. ggplot themes
+
+One way to make major changes to the overall aesthetic of your graph is using *themes* (that may exist in ggplot, or in other packages that you can load and install like 'ggthemes')
+
+Some examples to try:
+
+- theme_bw()
+- theme_minimal()
+- theme_classic()
+  
+Using themes doesn't finalize your graph, but it can give you a better "starting point" for customization.
+
+
+```{r ca_np_graph_2}
+
+ggplot(data = np_ca, aes(x = year, y = visitors)) +
+  geom_point(aes(color = park_name)) + 
+  xlab("Year") +
+  ylab("Annual Visitors") +
+  theme_classic() +
+  ggtitle("California National Parks Visitation") +
+  theme(legend.title=element_blank())
+
+```
+
+
+##8. ggplot geoms (types of graphics)
+
+We just made a few scatterplot graphs. But what if we wanted to make a line graph? Then do we have to start over? No...as long as the *type* of data is compatible with the new geom that you choose, then all you'd have to change is that layer. 
+
+Notice all of the types of geoms that exist when you start typing it in. And there are even other packages with **more** geom types that you can get. 
+
+```{r}
+
+ggplot(data = np_ca, aes(x = year, y = visitors)) +
+  geom_line(aes(color = park_name)) + 
+  xlab("Year") +
+  ylab("Annual Visitors") +
+  theme_classic() +
+  ggtitle("California National Parks Visitation") +
+  theme(legend.title=element_blank())
+
+
+```
+
+Keep in mind that the type of graph you're trying to create needs to be compatible with the data you're telling it to use. 
+
+For example, if I want to make a histogram of visitation, then I couldn't give it both an x- and y- quantitative variable (since the y-axis on a histogram is always just the frequency of events within a bin). So a histogram only asks for one variable. A boxplot typically has one categorical variable and one quantitative variable. For example: 
+
+```{r}
+
+ggplot(data = np_ca, aes(x = park_name, y = visitors)) +
+  geom_boxplot(aes(fill = park_name)) # And you'd obviously want to customize (e.g. x-axis labels)
+
+ggplot(data = np_ca, aes(x = park_name, y = visitors)) +
+  geom_jitter(aes(color = park_name), width = 0.1, alpha = 0.4) +
+  theme_bw()
+
+```
+
+...and then you can continue to customize.
+
+You can also *combine* different types of compatible graphs. For example, you can create a graph with lines and points by using both geom_line and geom_point. 
+
+Using the Dinosaur National Monument subset we created (dino_nm):
+
+```{r dino_point_line}
+
+ggplot(data = dino_nm, aes(x = year, y = visitors)) +
+  geom_point() +
+  geom_line()
+
+```
+
+##9. faceting
+
+Considering our CA National Parks Visitation, what if we wanted each National Park to exist in its own graphics space? Would we need to create a new graph for each? No - we can use facet_wrap to split up the graph by a variable that we pick (here, park_name). 
+
+```{r facet_wrap}
+
+ggplot(data = np_ca, aes(x = year, y = visitors)) + # There are (1) and (2)
+  geom_point() + # This is (3) - what type of graph do you want to create? 
+  xlab("Year") +
+  ylab("Annual Visitors") +
+  theme_bw() +
+  ggtitle("California National Parks Visitation") +
+  facet_wrap(~park_name)
+
+```
+
+##10. Bar plots
+
+##11. Exporting your gg-graphs
