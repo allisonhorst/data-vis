@@ -9,7 +9,9 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-We'll be using data for National Parks visitation to practice basic data visualization using ggplot (from the National Park Service)
+We'll be using data for National Parks visitation to practice basic data visualization using ggplot (from the National Park Service at <https://irma.nps.gov/Stats/SSRSReports>).
+
+Make sure to check out the Ocean Health Index Data Science Training book at <http://ohi-science.org/data-science-training/>, which includes more detail, examples and resources for using ggplot in Chapter 5. 
 
 ##What is ggplot? 
 
@@ -209,22 +211,41 @@ ggplot(data = np_ca, aes(x = park_name, y = visitors)) +
   geom_boxplot(aes(fill = park_name)) # And you'd obviously want to customize (e.g. x-axis labels)
 
 ggplot(data = np_ca, aes(x = park_name, y = visitors)) +
-  geom_jitter(aes(color = park_name), width = 0.1, alpha = 0.4) +
-  theme_bw()
+  geom_jitter(aes(color = park_name), width = 0.1, alpha = 0.4)
+  
 
 ```
 
 ...and then you can continue to customize.
 
+Example customization: 
+
+```{r}
+
+ggplot(data = np_ca, aes(x = park_name, y = visitors)) +
+  geom_jitter(aes(color = park_name), 
+              width = 0.1, 
+              alpha = 0.4) +
+  theme_bw() +
+  ylab("Annual Visitors") +
+  xlab("") +
+  coord_flip() +
+  theme(legend.position = "none", 
+        axis.text.x = element_text(angle = 45, hjust = 1))
+
+
+```
+
 You can also *combine* different types of compatible graphs. For example, you can create a graph with lines and points by using both geom_line and geom_point. 
 
 Using the Dinosaur National Monument subset we created (dino_nm):
 
-```{r dino_point_line}
+```{r dino_point_line, message = FALSE}
 
 ggplot(data = dino_nm, aes(x = year, y = visitors)) +
   geom_point() +
-  geom_line()
+  geom_line() +
+  geom_smooth()
 
 ```
 
@@ -234,8 +255,8 @@ Considering our CA National Parks Visitation, what if we wanted each National Pa
 
 ```{r facet_wrap}
 
-ggplot(data = np_ca, aes(x = year, y = visitors)) + # There are (1) and (2)
-  geom_point() + # This is (3) - what type of graph do you want to create? 
+ggplot(data = np_ca, aes(x = year, y = visitors)) + 
+  geom_point() + 
   xlab("Year") +
   ylab("Annual Visitors") +
   theme_bw() +
@@ -246,4 +267,87 @@ ggplot(data = np_ca, aes(x = year, y = visitors)) + # There are (1) and (2)
 
 ##10. Bar plots
 
+First, let's make a subset only of data for visitor counts from 2016 for all of the National Parks and National Monuments in the original np_visit dataset. I'll call my subset 'visit_16'.
+
+```{r data_2016}
+
+visit_16 <- np_visit %>% 
+  filter(year == 2016) %>% 
+  filter(type == "National Park" | 
+           type == "National Monument")
+  
+```
+
+
+So we have 134 parks that are designated as either National Parks or National Monuments.
+
+We can use geom_bar() in ggplot to *count* and display (as a bar) the number of times a certain outcome or character string appears in a column. 
+
+Here, we'll create a bar graph showing how many NPs and NMs had recorded visitors in 2016. Note that you do NOT give it the counts - that's what geom_bar does for us.
+
+```{r bar_16}
+
+ggplot(visit_16, aes(x = type)) +
+  geom_bar()
+
+```
+
+What if we would like to know where (in what region) each of these exist? We can use the fill() argument to create a stacked bar graph, where the different colors indicate counts within each region.
+
+```{r stacked_16}
+
+ggplot(visit_16, aes(x = type)) +
+  geom_bar(aes(fill = region)) +
+  theme_bw()
+
+```
+
+Just a couple more things. The graph we just made shows the actual counts as a stacked bar graph. We might just be interested in the *proportions* of each monument type that exist in each region, or we might like an "unstacked" version. 
+
+Use the position argument to adjust geom_bar appearance. Set to "fill" if you want proportions shown (so all bars will be from 0 to 1), and "dodge" to have bars appear side-by-side for each group.
+
+*Note that updating the position doesn't automatically correct the y-axis label, as you'll see below.*
+
+Using position = "fill":
+
+```{r}
+
+ggplot(visit_16, aes(x = type)) +
+  geom_bar(aes(fill = region), position = "fill") +
+  theme_bw() +
+  ylab("Proportion")
+
+```
+
+Using position = "dodge": 
+
+```{r}
+
+ggplot(visit_16, aes(x = type)) +
+  geom_bar(aes(fill = region), position = "dodge") +
+  theme_bw()
+
+```
+
 ##11. Exporting your gg-graphs
+
+To export a hi-res version of your beautiful graph, make sure that you store your graph (assign it a name...we haven't been doing that so far).
+
+I'll copy and paste the code for the bar graph I made above, and store it as 'park_graph'.
+
+```{r}
+
+park_graph <- ggplot(visit_16, aes(x = type)) +
+  geom_bar(aes(fill = region), position = "dodge") +
+  theme_bw()
+
+```
+
+Then use ggsave() to export, including the size (width = , height = ) and resolution (dpi = ) as desired.
+
+```{r}
+
+ggsave("my_park_graph.png", park_graph, width = 5, height = 5, dpi = 300)
+
+```
+
