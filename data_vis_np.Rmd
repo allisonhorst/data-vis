@@ -15,7 +15,7 @@ Make sure to check out the Ocean Health Index Data Science Training book at <htt
 
 ##What is ggplot? 
 
-ggplot is a graphics package specifically built to help you iteratively create customized graphs. It exists solo, or within the *tidyverse* - a collection of data wrangling, visualizing, and presenting packages that play nicely together. 
+ggplot2 is a graphics package specifically built to help you iteratively create customized graphs. It exists solo, or within the *tidyverse* - a collection of data wrangling, visualizing, and presenting packages that play nicely together. 
 
 ##1. Load tidyverse (install if necessary)
 
