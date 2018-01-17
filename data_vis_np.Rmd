@@ -39,7 +39,7 @@ Load the np_visit.csv file (sent in email, or pulled from GitHub) into RStudio. 
 
 ```{r data, results = "hide", message = FALSE}
 
-np_visit <- read_csv("~/Documents/Bren Courses/EcoDataSci Meetings/Data Vis/NP Visitation/np_visit.csv")
+np_visit <- read_csv("~/github/data-vis/np_visit.csv")
 
 ```
 
