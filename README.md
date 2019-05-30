@@ -1,5 +1,5 @@
 # data-vis
-This repository has the code and data files necessary for the 'Data Visualization - Introduction to ggplot' workshop on January 17, 2018 at UCSB. The objective is to introduce basics of creating and customizing graph using ggplot, including:
+This repository has the code and data files necessary for the '[Data Visualization - Introduction to ggplot' workshop on January 17, 2018 at UCSB](https://rawcdn.githack.com/allisonhorst/data-vis/fc107e063f50ef8695b0a75ed73d74720aca2c65/data_vis_np.html). The objective is to introduce basics of creating and customizing graph using ggplot, including:
 
 - General structure of ggplot() code
 - Customizing axes labels and titles
