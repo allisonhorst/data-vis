@@ -38,8 +38,8 @@ library(tidyverse)
 Load the np_visit.csv file (sent in email, or pulled from GitHub) into RStudio. Helpers will be ready to assist you. 
 
 ```{r data, results = "hide", message = FALSE}
-
-np_visit <- read_csv("~/github/data-vis/np_visit.csv")
+# If in your root directory:
+np_visit <- read_csv("np_visit.csv")
 
 ```
 
